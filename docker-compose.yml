@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  pyinstaller:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app
+    entrypoint: ["bash", "-c", "pyinstaller --onefile --add-data 'data;data' main.py && cp dist/main.exe /app/output/"]
+

@@ -1,0 +1,10 @@
+PyQt5
+qt-material
+pandas
+pyinstaller
+requests
+python-dotenv
+matplotlib
+mplfinance
+plotly
+PyQtWebEngine
