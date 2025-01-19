@@ -60,8 +60,18 @@ class Screen1(QWidget):
         self.slPercentSpin.setMaximum(1000)
         form.addRow("SL %:", self.slPercentSpin)
 
+        self.timeframe_combo = QComboBox()
+        self.timeframe_combo.addItems([
+            "1 minute", "3 minute", "5 minute", "15 minute",
+            "30 minute", "1 hour", "4 hour", "1 day"
+        ])
+        form.addRow("Timeframe:", self.timeframe_combo)
+
         self.withCompoundingCheck = QCheckBox("With Compounding")
         form.addRow(self.withCompoundingCheck)
+
+        self.useAlternateSignalCheck = QCheckBox("Use Alternate Signal")
+        form.addRow(self.useAlternateSignalCheck)
 
         self.fileButton = QPushButton("Select File")
         self.fileLabel = QLabel("No file selected")
@@ -156,11 +166,11 @@ class Screen1(QWidget):
             "TP_percent": self.tpPercentSpin.value(),
             "SL_percent": self.slPercentSpin.value(),
             "File": self.selectedFile,
-            "WithCompounding": self.withCompoundingCheck.isChecked()
+            "WithCompounding": self.withCompoundingCheck.isChecked(),
+            "useAlternateSignal": self.useAlternateSignalCheck.isChecked()
         }
 
         QTimer.singleShot(100, lambda: self.processSubmission(data))
 
     def processSubmission(self, data):
         self.mainWindow.showScreen2(data)
-

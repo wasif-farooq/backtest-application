@@ -12,12 +12,11 @@ load_dotenv()
 
 
 class BinanceData:
-    def __init__(self, api_url: str, symbol: str, interval: str):
+    def __init__(self, api_url: str, symbol: str, interval: str, file: str):
         self.api_url = api_url
         self.symbol = symbol.upper()
         self.interval = interval
-        self.data_handler = DataHandler(
-            f"data/{self.symbol}--{self.interval}.csv")
+        self.data_handler = DataHandler(file)
 
     def fetch_kline_data(self, start_time: int = None, end_time: int = None, limit: int = 500):
         endpoint = f"{self.api_url}/fapi/v1/klines"
@@ -56,10 +55,6 @@ class BinanceData:
                 "Volume": float(kline[5]),
             }
             self.data_handler.upsert(row)
-            # if result == "created":
-            #     # print(f"New record created: {row}")
-            # elif result == "updated":
-            #     # print(f"Record updated: {row}")
 
         self.data_handler.data.sort_values(
             by="Datetime", ascending=True, inplace=True)

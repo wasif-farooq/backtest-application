@@ -27,7 +27,6 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.screen2)
 
     def simulateTrades(self, formData):
-        # Get Candle File from Screen1
         candles_path = self.screen1.candleFileCombo.currentText()
 
         if not candles_path or not os.path.exists(candles_path):
@@ -42,7 +41,6 @@ class MainWindow(QMainWindow):
                 self, "Error", f"Error loading Candle File: {e}")
             return [], pd.DataFrame()
 
-        # Transform signals CSV using provided code
         if not formData.get("File"):
             QMessageBox.warning(self, "Error", "No Signals File provided.")
             return [], pd.DataFrame()
@@ -83,12 +81,23 @@ class MainWindow(QMainWindow):
         tp_percent = formData.get("TP_percent", 0)
         sl_percent = formData.get("SL_percent", 0)
         with_compounding = formData.get("WithCompounding", False)
+        use_alternate_signall = formData.get("useAlternateSignal", False)
 
         simulation = TradeSimulation(
-            candles_df, signals_df, capital, leverage,
-            maker_fee_rate, taker_fee_rate, tp_percent, sl_percent, with_compounding
+            candles_df,
+            signals_df,
+            capital,
+            leverage,
+            maker_fee_rate,
+            taker_fee_rate,
+            tp_percent,
+            sl_percent,
+            with_compounding,
+            use_alternate_signall
         )
-        simulation.run_simulation()
+
+        simulation.tranform()
+        simulation.run_backtest()
         completed_trades = simulation.completed_trades
 
         monthly_stats = []
@@ -96,6 +105,7 @@ class MainWindow(QMainWindow):
             return monthly_stats, pd.DataFrame()
 
         trades_df = pd.DataFrame(completed_trades)
+
         trades_df["Datetime"] = pd.to_datetime(trades_df["Datetime"])
         trades_df["Month"] = trades_df["Datetime"].dt.to_period(
             "M").astype(str)

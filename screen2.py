@@ -2,8 +2,18 @@ import os
 import pandas as pd
 import plotly.graph_objects as go
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QFormLayout,
-    QLabel, QSizePolicy, QHeaderView, QPushButton, QDialog, QVBoxLayout
+    QWidget,
+    QVBoxLayout,
+    QTableWidget,
+    QTableWidgetItem,
+    QFormLayout,
+    QLabel,
+    QSizePolicy,
+    QHeaderView,
+    QPushButton,
+    QDialog,
+    QVBoxLayout,
+    QFileDialog
 )
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtCore import QUrl
@@ -38,6 +48,11 @@ class Screen2(QWidget):
         self.layout.addWidget(self.statsTable)
         self.layout.addWidget(self.tradesTable)
 
+        # Export to CSV button
+        self.exportButton = QPushButton("Export to CSV")
+        self.exportButton.clicked.connect(self.exportToCSV)
+        self.layout.addWidget(self.exportButton)
+
     def updateUserInputs(self, formData):
         while self.userInfoLayout.count():
             child = self.userInfoLayout.takeAt(0)
@@ -48,6 +63,8 @@ class Screen2(QWidget):
 
     def updateTable(self, stats, trades_df):
         # Update monthly stats table
+        self.trades_df = trades_df  # Save trades_df for export functionality
+
         if stats:
             headers = list(stats[0].keys())
             num_data_rows = len(stats)
@@ -218,6 +235,21 @@ class Screen2(QWidget):
         # Cleanup temporary HTML file
         os.remove(chart_file)
 
+    def exportToCSV(self):
+        if self.trades_df is None or self.trades_df.empty:
+            return
+
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save Trades to CSV", "", "CSV Files (*.csv);;All Files (*)", options=options
+        )
+        if file_path:
+            try:
+                self.trades_df.to_csv(file_path, index=False)
+                print(f"Trades saved successfully to {file_path}")
+            except Exception as e:
+                print(f"Failed to save trades: {e}")
+
     def goBack(self):
         # Reset form fields on Screen1
         self.mainWindow.screen1.capitalSpin.setValue(0)
@@ -235,4 +267,3 @@ class Screen2(QWidget):
 
         # Navigate back to Screen1
         self.mainWindow.stack.setCurrentWidget(self.mainWindow.screen1)
-
