@@ -128,7 +128,7 @@ class TradeSimulation:
         trade_size = self.capital * self.leverage
         maker_fee = trade_size * self.maker_fee_rate / 100
         taker_fee = trade_size * self.taker_fee_rate / 100
-        trade_fee = taker_fee - maker_fee
+        trade_fee = taker_fee + maker_fee
         self.capital = self.capital if self.with_compounding else self.inital_capital
 
         price_diff = price - trade['Entry_Price']
