@@ -82,6 +82,7 @@ class MainWindow(QMainWindow):
         sl_percent = formData.get("SL_percent", 0)
         with_compounding = formData.get("WithCompounding", False)
         use_alternate_signall = formData.get("useAlternateSignal", False)
+        interval = formData.get("interval", False)
 
         simulation = TradeSimulation(
             candles_df,
@@ -93,7 +94,8 @@ class MainWindow(QMainWindow):
             tp_percent,
             sl_percent,
             with_compounding,
-            use_alternate_signall
+            use_alternate_signall,
+            interval
         )
 
         simulation.tranform()
@@ -137,4 +139,3 @@ class MainWindow(QMainWindow):
             self.screen3 = Screen3(self)
             self.stack.addWidget(self.screen3)
         self.stack.setCurrentWidget(self.screen3)
-

@@ -158,6 +158,15 @@ class Screen1(QWidget):
         self.submitButton.setEnabled(False)
         self.submitButton.setText("Loading...")
 
+        timeframe_text = self.timeframe_combo.currentText()
+
+        timeframe_map = {
+            "1 minute": "1", "3 minute": "3", "5 minute": "5",
+            "15 minute": "15", "30 minute": "30",
+            "1 hour": "60", "4 hour": "240", "1 day": "1440"
+        }
+        interval = timeframe_map.get(timeframe_text, "1")
+
         data = {
             "Capital": self.capitalSpin.value(),
             "Leverage": self.leverageSpin.value(),
@@ -167,7 +176,8 @@ class Screen1(QWidget):
             "SL_percent": self.slPercentSpin.value(),
             "File": self.selectedFile,
             "WithCompounding": self.withCompoundingCheck.isChecked(),
-            "useAlternateSignal": self.useAlternateSignalCheck.isChecked()
+            "useAlternateSignal": self.useAlternateSignalCheck.isChecked(),
+            "interval": interval
         }
 
         QTimer.singleShot(100, lambda: self.processSubmission(data))

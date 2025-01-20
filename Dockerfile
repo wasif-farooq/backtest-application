@@ -1,21 +1,47 @@
-FROM debian:bullseye
+# Use Ubuntu as the base image
+FROM ubuntu:20.04
 
-# Install Python, pip, and mingw-w64 (cross-compiler for Windows)
-RUN apt-get update && apt-get install -y \
-	python3 python3-pip mingw-w64
+# Set environment variables for non-interactive installation
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Set working directory
-WORKDIR /app
+# Install necessary tools and dependencies
+RUN dpkg --add-architecture i386 && \
+	apt-get update && apt-get install -y \
+	software-properties-common \
+	wget \
+	gnupg2 \
+	apt-transport-https \
+	build-essential \
+	python3 \
+	python3-pip \
+	python3-dev \
+	qt5-default \
+	qttools5-dev-tools \
+	qttools5-dev \
+	libqt5svg5-dev \
+	dpkg \
+	zip \
+	mingw-w64 \
+	wine64 \
+	wine32:i386 && \
+	rm -rf /var/lib/apt/lists/*
 
-# Copy application files
-COPY . .
-
-# Install Python dependencies
+# Install pyinstaller
 RUN pip3 install pyinstaller
 
-# Build Windows executable
-RUN pyinstaller --onefile --name app.exe main.py
+# Create a working directory
+WORKDIR /app
 
-# Output directory for the build
-CMD ["cp", "/app/dist/app.exe", "/output"]
+# Copy application files into the container
+COPY . /app
+
+# Install Python dependencies from requirements.txt
+COPY requirements.txt /app/
+RUN pip3 install -r requirements.txt
+
+# Set Wine configuration
+RUN winecfg
+
+# Command to build the Windows executable
+CMD ["pyinstaller", "--onefile", "--windowed", "your_script.py"]
 

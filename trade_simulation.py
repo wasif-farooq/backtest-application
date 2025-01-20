@@ -14,7 +14,8 @@ class TradeSimulation:
         tp_percent,
         sl_percent,
         with_compounding,
-        use_alternate_signall
+        use_alternate_signall,
+        interval
     ):
         self.candles_df = candles_df.copy()
         self.signals_df = signals_df.copy()
@@ -27,6 +28,7 @@ class TradeSimulation:
         self.sl_percent = sl_percent
         self.with_compounding = with_compounding  # Store the compounding flag
         self.use_alternate_signall = use_alternate_signall
+        self.interval = interval
 
         self.active_trades = []
         self.completed_trades = []
@@ -211,6 +213,15 @@ class TradeSimulation:
 
         if last_candle is None:
             return
+
+        if len(self.active_trades) > 0:
+            minute = pd.Timedelta(minutes=int(self.interval))
+            seconds = pd.Timedelta(seconds=1)
+
+            skip_time = pd.to_datetime(
+                self.active_trades[-1]['Datetime']) + minute - seconds
+            if index <= skip_time:
+                return
 
         for trade in self.active_trades[:]:
             self.calculate_trade(
